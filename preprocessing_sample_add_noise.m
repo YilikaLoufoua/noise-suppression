@@ -5,7 +5,7 @@ adsTrain = audioDatastore(fullfile(dataFolder));
 reduceDataset = true;
 if reduceDataset
     adsTrain = shuffle(adsTrain);
-    adsTrain = subset(adsTrain,1:1000);
+    adsTrain = subset(adsTrain,1:100);
 end
 
 % Import noise dataset
@@ -25,7 +25,7 @@ numSegments = 8;
 % Create a sample rate converter to convert the 48 kHz audio to 8 kHz
 src = dsp.SampleRateConverter("InputSampleRate",inputFs, ...
                               "OutputSampleRate",fs, ...
-                              "Bandwidth",8000);
+                              "Bandwidth",7920);
 
 % Extract Features Using Tall Arrays
 T = tall(adsTrain);

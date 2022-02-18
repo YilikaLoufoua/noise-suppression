@@ -10,20 +10,11 @@ function [targets, predictors] = HelperGenerateSpeechDenoisingFeatures(x, adsNoi
     fs = 8e3;
     numFeatures = ffTLength/2 + 1;
     numSegments = 8;
-
-    % Make the audio length a multiple of the sample rate converter decimation factor.
-    decimationFactor = inputFs/fs;
-    L = floor(numel(x)/decimationFactor);
-    x = x(1:decimationFactor*L);
-    
-    % Convert the audio sample rate 
-    x = src(x);
-    reset(src)
     
     % Select a random noise sample
     adsNoise = shuffle(adsNoise);
     noise = read(adsNoise);
-    
+
     % Set the audio samples to uniform length of 10 seconds
     inputFs = 48000;
     expected_length = 10;
@@ -40,6 +31,18 @@ function [targets, predictors] = HelperGenerateSpeechDenoisingFeatures(x, adsNoi
         blankSignal = zeros(expected_length * inputFs - length(noise),1);
         noise = [noise; blankSignal];
     end
+
+    % Make the singal lengths a multiple of the sample rate converter decimation factor.
+    decimationFactor = inputFs/fs;
+    L = floor(numel(x)/decimationFactor);
+    x = x(1:decimationFactor*L);
+    noise = noise(1:decimationFactor*L);
+
+    % Downsample the signals
+    x = src(x);
+    reset(src);
+    noise = src(noise);
+    reset(src);
     
     % Set the noise power such that the signal-to-noise ratio (SNR) is zero dB
     speechPower = sum(x.^2);
