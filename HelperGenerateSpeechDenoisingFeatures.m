@@ -31,7 +31,7 @@ function [targets, predictors] = HelperGenerateSpeechDenoisingFeatures(x, adsNoi
         blankSignal = zeros(expected_length * inputFs - length(noise),1);
         noise = [noise; blankSignal];
     end
-    
+
 
     % Make the singal lengths a multiple of the sample rate converter decimation factor.
     decimationFactor = inputFs/fs;
@@ -63,7 +63,6 @@ function [targets, predictors] = HelperGenerateSpeechDenoisingFeatures(x, adsNoi
     speechPower = sum(x.^2);
     noisePower = sum(noise.^2);
     noisyAudio = x + sqrt(speechPower/noisePower) * noise;
-
 
     % Generate magnitude STFT vectors from the original and noisy audio signals.
     cleanSTFT = stft(x,'Window',win,'OverlapLength',overlap,'FFTLength',ffTLength);

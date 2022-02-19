@@ -5,7 +5,7 @@ adsTrain = audioDatastore(fullfile(dataFolder));
 reduceDataset = true;
 if reduceDataset
     adsTrain = shuffle(adsTrain);
-    % adsTrain = subset(adsTrain,1:100);
+    adsTrain = subset(adsTrain,1:100);
 end
 
 % Import noise dataset
