@@ -34,6 +34,8 @@ T = tall(adsTrain);
 % The function HelperGenerateSpeechDenoisingFeatures generates targets and
 % predictors at each cell
 [targets,predictors] = cellfun(@(x)HelperGenerateSpeechDenoisingFeatures(x,adsNoise,src),T,"UniformOutput",false);
+targets = targets(cellfun(@(x) ~isequal(x, 0), targets));
+predictors = predictors(cellfun(@(x) ~isequal(x, 0), predictors));
 
 % Evaluate the targets and predictors.
 [targets,predictors] = gather(targets,predictors);
