@@ -5,24 +5,17 @@ adsTrain = audioDatastore(fullfile(dataFolder));
 reduceDataset = true;
 if reduceDataset
     adsTrain = shuffle(adsTrain);
-<<<<<<< Updated upstream
-    adsTrain = subset(adsTrain,1:100);
-=======
     adsTrain = subset(adsTrain,1:258);
->>>>>>> Stashed changes
 end
 
 % Import noise dataset
 noiseFolder = "datasets_fullband/noise_fullband";
 adsNoise = audioDatastore(fullfile(noiseFolder));
 
-<<<<<<< Updated upstream
-=======
 % Keep one testing noise sample to not train with 
 [testNoise,adsNoiseInfo] = read(adsNoise);
 adsNoise = subset(adsNoise,2:length(adsNoise.Files));
 
->>>>>>> Stashed changes
 % Define system parameters for generating target and predictor signals
 windowLength = 256;
 win = hamming(windowLength,"periodic");
@@ -49,9 +42,6 @@ targets = targets(cellfun(@(x) ~isequal(x, 0), targets));
 predictors = predictors(cellfun(@(x) ~isequal(x, 0), predictors));
 
 % Evaluate the targets and predictors.
-<<<<<<< Updated upstream
-[targets,predictors] = gather(targets,predictors);
-=======
 [targets,predictors] = gather(targets,predictors);
 
 % Normalize the targets and predictors using their respective mean and
@@ -237,4 +227,3 @@ set(h,'Position',[p(1) 65 p(3) 800]);
 % sound(noisyAudio,fs)
 % sound(denoisedAudioFullyConnected,fs)
 % sound(cleanAudio,fs)
->>>>>>> Stashed changes
