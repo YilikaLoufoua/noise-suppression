@@ -6,7 +6,6 @@ function [targets, predictors] = HelperGenerateSpeechDenoisingFeatures(x, adsNoi
     win = hamming(windowLength,"periodic");
     overlap = round(0.75 * windowLength);
     ffTLength = windowLength;
-    inputFs = 48e3;
     fs = 8e3;
     numFeatures = ffTLength/2 + 1;
     numSegments = 8;
@@ -44,21 +43,7 @@ function [targets, predictors] = HelperGenerateSpeechDenoisingFeatures(x, adsNoi
     reset(src);
     noise = src(noise);
     reset(src);
-
-    % Normalize audio files so they are the same amplitude(loudness)
-    [x,scalar] = norm_amplitude(x);
-    [noise,scalar] = norm_amplitude(noise);
     
-    % Skip the clean files that is mostly empty
-    activity_threshold = 0.6;
-    clean_activity = check_activity(x);
-    if(clean_activity < activity_threshold)
-        plot(x);
-        predictors = 0;
-        targets = 0;
-       return;
-    end
-
     % Set the noise power such that the signal-to-noise ratio (SNR) is zero dB
     speechPower = sum(x.^2);
     noisePower = sum(noise.^2);
@@ -81,32 +66,3 @@ function [targets, predictors] = HelperGenerateSpeechDenoisingFeatures(x, adsNoi
     targets = cleanSTFT;
     predictors = stftSegments;
 end
-
-
-function [y, scalar] = norm_amplitude(y, eps)
-    if ~exist('eps','var')
-        eps=1* (10^-6);
-    end
-    scalar = max(abs(y)) + eps;
-    y = y / scalar;
-end
-
-function [y, rms, scalar] = tailor_dB_FS(y, target_dB_FS, eps)
-     if ~exist('target_dB_FS','var')
-        target_dB_FS=-25;
-     end
-     if ~exist('eps','var')
-        eps=1* (10^-6);
-    end
-    rms = sqrt(mean(sqr(y)));
-    scalar = (10 ^ (target_dB_FS / 20)) / (rms + eps);
-    y = y * scalar;
-end
-
-function [percent_active] = check_activity(y, threshold)
-    if ~exist('threshold','var')
-        threshold=0.004;
-     end
-    percent_active = sum(abs(y) > threshold) / length(y);
-end
-
