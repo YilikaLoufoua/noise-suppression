@@ -22,19 +22,16 @@ classdef reshapeLayer < nnet.layer.Layer & nnet.layer.Formattable
             % end
             formatedArr = X;
             if(layer.isIn1)
-                 formatedArr = permute(formatedArr, [1,3,2,4]);
+                sizeArr = size(X);
+                formatedArr = reshape(formatedArr, [sizeArr(1),1,sizeArr(2),1]);
+                 % formatedArr = permute(formatedArr, [1,3,2,4]);
                 % formatedArr = dlfeval(@permuteCross,X);
-            end
+            end 
             Z = dlarray(formatedArr,'SCBT');
             % Z = reshape(Z, [257,8,1]);
+            
             
         end
     end
     
-end
-
-
-function formatedArr = permuteCross(input)
-    formatedArr = extractdata(input);
-    formatedArr = permute(formatedArr, [1,3,2,4]);
 end

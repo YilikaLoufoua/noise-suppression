@@ -32,7 +32,8 @@ tempLayers = [
 lgraph = addLayers(lgraph,tempLayers);
 
 tempLayers = [
-    concatLayer("InputNames", {'in1'  'in2'})
+    % concatLayer("InputNames", {'in1'  'in2'})
+    concatenationLayer(2,2,"Name","concat")
     normLayer("Name","norm_2")
     flattenLayer("Name","flatten_2")
     lstmLayer(numHiddenUnits_sb,"Name","lstm_3")
