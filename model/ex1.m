@@ -18,7 +18,7 @@ lgraph = layerGraph();
 tempLayers = sequenceInputLayer([numFeatures,numSegments],"Name","sequence_1");
 lgraph = addLayers(lgraph,tempLayers);
 
-tempLayers= reshapeLayer(false,"Name","reshape_1");
+tempLayers= [normLayer("Name","norm_2")  reshapeLayer(false,"Name","reshape_1")];
 lgraph = addLayers(lgraph,tempLayers);
 
 tempLayers = [
@@ -34,7 +34,7 @@ lgraph = addLayers(lgraph,tempLayers);
 tempLayers = [
     % concatLayer("InputNames", {'in1'  'in2'})
     concatenationLayer(2,2,"Name","concat")
-    normLayer("Name","norm_2")
+    normLayer("Name","norm_3")
     flattenLayer("Name","flatten_2")
     lstmLayer(numHiddenUnits_sb,"Name","lstm_3")
     lstmLayer(numHiddenUnits_sb,"Name","lstm_4")
@@ -45,15 +45,15 @@ lgraph = addLayers(lgraph,tempLayers);
 % clean up helper variable
 clear tempLayers;
 lgraph = connectLayers(lgraph,"sequence_1","norm_1");
-lgraph = connectLayers(lgraph,"sequence_1","reshape_1");
+lgraph = connectLayers(lgraph,"sequence_1","norm_2");
 lgraph = connectLayers(lgraph,"reshape_1","concat/in2");
 lgraph = connectLayers(lgraph,"reshape_2","concat/in1");
 
 
 miniBatchSize = 128;
 options = trainingOptions("adam", ...
-    MaxEpochs=3, ...
-    InitialLearnRate=1e-5,...
+    MaxEpochs=4, ...
+    InitialLearnRate=0.001,...
     MiniBatchSize=miniBatchSize, ...
     Shuffle="every-epoch", ...
     Plots="training-progress", ...
