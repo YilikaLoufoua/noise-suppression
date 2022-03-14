@@ -14,20 +14,17 @@ classdef reshapeLayer < nnet.layer.Layer & nnet.layer.Formattable
             layer.isIn1 = isIn1;
         end
         function Z = predict(layer, X)
-            % if(size(layer.NewShapeArr)==3)
-            %     Z = reshape(X,layer.NewShapeArr(1),layer.NewShapeArr(2),layer.NewShapeArr(3));
-           %  end
-            % if (size(layer.NewShapeArr)==4)
-            %         Z = reshape(X,layer.NewShapeArr(1),layer.NewShapeArr(2),layer.NewShapeArr(3),layer.NewShapeArr(4));
-            % end
             formatedArr = X;
+            Z = X;
+            % special manupulation of input1 size to be ready for concat
+            % layer
             if(layer.isIn1)
                 sizeArr = size(X);
                 formatedArr = reshape(formatedArr, [sizeArr(1),1,sizeArr(2),1]);
+                Z = dlarray(formatedArr,'SCBT');
                  % formatedArr = permute(formatedArr, [1,3,2,4]);
                 % formatedArr = dlfeval(@permuteCross,X);
             end 
-            Z = dlarray(formatedArr,'SCBT');
             % Z = reshape(Z, [257,8,1]);
             
             

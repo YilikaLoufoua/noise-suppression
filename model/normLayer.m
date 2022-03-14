@@ -11,8 +11,11 @@ classdef normLayer < nnet.layer.Layer & nnet.layer.Formattable
             layer.Name = NVargs.Name;
         end
         function Z = predict(layer, X)
+            % mean normalization
             % mu = mean(X,'all');
             % normed = X / (mu + 1e-5);
+            
+            % max normalization
             maxVal = max( X ,[], 'all' )+ 1e-5;
             normed = X / maxVal;
             Z = normed;

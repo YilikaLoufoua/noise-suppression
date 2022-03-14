@@ -6,6 +6,7 @@ adsNoise = audioDatastore("../datasets_fullband/noise_fullband",IncludesubFolder
 % This transform datastore returns pairs (clean/noise) STFT
 tds = transform(adsSpeech,@(x)HelperGenerateSpeechDenoisingFeatures(x,adsNoise));
 
+% Params for model layers
 numFeatures = 257;
 FFTLength = 512;
 win_length = 512;
@@ -14,15 +15,18 @@ numHiddenUnits_fb = 512;
 numHiddenUnits_sb = 384;
 numSegments = 8;
 
+% Construct model layers
 lgraph = layerGraph();
-tempLayers = sequenceInputLayer([numFeatures,numSegments],"Name","sequence_1");
+tempLayers = [sequenceInputLayer([numFeatures,numSegments],"Name","sequence_1")
+                normLayer("Name","norm_1")];
 lgraph = addLayers(lgraph,tempLayers);
 
-tempLayers= [normLayer("Name","norm_2")  reshapeLayer(false,"Name","reshape_1")];
+% RHS
+tempLayers= reshapeLayer(false,"Name","reshape_1");
 lgraph = addLayers(lgraph,tempLayers);
 
+%LHS
 tempLayers = [
-    normLayer("Name","norm_1")
     flattenLayer("Name","flatten")
     lstmLayer(numHiddenUnits_fb,"Name","lstm_1")
     lstmLayer(numHiddenUnits_fb,"Name","lstm_2")
@@ -32,7 +36,6 @@ tempLayers = [
 lgraph = addLayers(lgraph,tempLayers);
 
 tempLayers = [
-    % concatLayer("InputNames", {'in1'  'in2'})
     concatenationLayer(2,2,"Name","concat")
     normLayer("Name","norm_3")
     flattenLayer("Name","flatten_2")
@@ -44,15 +47,15 @@ lgraph = addLayers(lgraph,tempLayers);
 
 % clean up helper variable
 clear tempLayers;
-lgraph = connectLayers(lgraph,"sequence_1","norm_1");
-lgraph = connectLayers(lgraph,"sequence_1","norm_2");
+lgraph = connectLayers(lgraph,"norm_1","reshape_1");
+lgraph = connectLayers(lgraph,"norm_1","flatten");
 lgraph = connectLayers(lgraph,"reshape_1","concat/in2");
 lgraph = connectLayers(lgraph,"reshape_2","concat/in1");
 
-
+% training options
 miniBatchSize = 128;
 options = trainingOptions("adam", ...
-    MaxEpochs=4, ...
+    MaxEpochs=3, ...
     InitialLearnRate=0.001,...
     MiniBatchSize=miniBatchSize, ...
     Shuffle="every-epoch", ...
@@ -62,4 +65,5 @@ options = trainingOptions("adam", ...
     LearnRateDropFactor=0.9, ...
     LearnRateDropPeriod=1);
 
+% train the model
 denoiseNetFullyConnected = trainNetwork(tds,lgraph,options);

@@ -25,13 +25,31 @@ end
 noise = resample(noise,1,6);
 
 % Adjust lengths of speech and noise signals
-if numel(audio)>=numel(noise)
-    audio = audio(1:numel(noise));
-    noiseSegment = noise;
+% if numel(audio)>=numel(noise)
+%     audio = audio(1:numel(noise));
+%     noiseSegment = noise;
+% else
+%     randind      = randi(numel(noise) - numel(audio) , [1 1]);
+%     noiseSegment = noise(randind : randind + numel(audio) - 1);
+% end
+
+inputFs = 8000;
+expected_length = 10;
+noiseSegment = noise;
+if numel(audio) > expected_length * inputFs
+    audio = audio(1:expected_length * inputFs);
 else
-    randind      = randi(numel(noise) - numel(audio) , [1 1]);
-    noiseSegment = noise(randind : randind + numel(audio) - 1);
+    blankSignal = zeros(expected_length * inputFs - numel(audio),1);
+    audio = [audio; blankSignal];
 end
+
+if numel(noiseSegment) > expected_length * inputFs
+    noiseSegment = noiseSegment(1:expected_length * inputFs);
+else
+    blankSignal = zeros(expected_length * inputFs - numel(noiseSegment),1);
+    noiseSegment = [noiseSegment; blankSignal];
+end
+
 
 % Achieve some SNR
 noisePower   = sum(noiseSegment.^2);
