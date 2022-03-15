@@ -14,7 +14,7 @@ NumSegments  = 8;
 % Convert from 48 Khz to 8 Khz
 audio = resample(audio,1,6);
 
-% Choose one noise file randomlyIf the noise file is invalid, choose another one.
+% Choose one noise file randomly. If the noise file is invalid, choose another one.
 noiseFiles = noiseDataset.Files;
 ind = randi([1 length(noiseFiles)]);
 noise = audioread(noiseFiles{ind});
