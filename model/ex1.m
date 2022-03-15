@@ -17,22 +17,22 @@ numSegments = 8;
 
 % Construct model layers
 lgraph = layerGraph();
-tempLayers = [sequenceInputLayer([numFeatures,numSegments],"Name","sequence_1")
-                normLayer("Name","norm_1")];
+tempLayers = sequenceInputLayer([numFeatures,numSegments],"Name","sequence_1");
 lgraph = addLayers(lgraph,tempLayers);
 
 % RHS
-tempLayers= reshapeLayer(false,"Name","reshape_1");
-lgraph = addLayers(lgraph,tempLayers);
+% tempLayers= reshapeLayer(false,"Name","reshape_1");
+% lgraph = addLayers(lgraph,tempLayers);
 
 %LHS
 tempLayers = [
+    normLayer("Name","norm_1")
     flattenLayer("Name","flatten")
     lstmLayer(numHiddenUnits_fb,"Name","lstm_1")
     lstmLayer(numHiddenUnits_fb,"Name","lstm_2")
     fullyConnectedLayer(numFeatures,"Name","fc_1")
     reluLayer("Name","relu")
-    reshapeLayer(true, "Name","reshape_2")];
+    reshapeLayer("Name","reshape_2")];
 lgraph = addLayers(lgraph,tempLayers);
 
 tempLayers = [
@@ -47,9 +47,8 @@ lgraph = addLayers(lgraph,tempLayers);
 
 % clean up helper variable
 clear tempLayers;
-lgraph = connectLayers(lgraph,"norm_1","reshape_1");
-lgraph = connectLayers(lgraph,"norm_1","flatten");
-lgraph = connectLayers(lgraph,"reshape_1","concat/in2");
+lgraph = connectLayers(lgraph,"sequence_1","norm_1");
+lgraph = connectLayers(lgraph,"sequence_1","concat/in2");
 lgraph = connectLayers(lgraph,"reshape_2","concat/in1");
 
 % training options
