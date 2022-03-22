@@ -9,7 +9,6 @@ win          = hamming(WindowLength,'periodic');
 Overlap      = round(0.75 * WindowLength);
 FFTLength    = WindowLength;
 NumFeatures  = FFTLength/2 + 1;
-NumSegments  = 8;
 
 % Convert from 48 Khz to 8 Khz
 audio = resample(audio,1,6);
@@ -40,21 +39,17 @@ noiseSegment = noiseSegment .* sqrt(cleanPower/noisePower);
 noisyAudio   = audio + noiseSegment;
 
 % Generate magnitude STFT vectors from the original and noisy audio signals.
-cleanSTFT = stft(audio, 'Window',win, 'OverlapLength', Overlap, 'FFTLength',FFTLength);
-cleanSTFT = abs(cleanSTFT(NumFeatures-1:end,:));
-noisySTFT = stft(noisyAudio, 'Window',win, 'OverlapLength', Overlap, 'FFTLength',FFTLength);
+[cleanSTFT, cleanFrequencies, cleanTimeInstants] = stft(audio, 'Window', win, 'OverlapLength', Overlap, 'FFTLength',FFTLength);
+cleanSTFT = abs(cleanSTFT);
+[noisySTFT, noisyFrenqeuncies, noisyTimeInstants] = stft(noisyAudio, 'Window',win, 'OverlapLength', Overlap, 'FFTLength',FFTLength);
 noisySTFT = abs(noisySTFT(NumFeatures-1:end,:));
 
-noisySTFTAugmented = [noisySTFT(:,1:NumSegments-1) noisySTFT];
-
-% Generate the 8-segment training predictor signals from the noisy STFT. 
-STFTSegments = zeros(NumFeatures, NumSegments , size(noisySTFTAugmented,2) - NumSegments + 1);
-for index = 1 : size(noisySTFTAugmented,2) - NumSegments + 1
-    STFTSegments(:,:,index) = noisySTFTAugmented(:,index:index+NumSegments-1);
-end
+% Reshape magnitude STFT vectors
+cleanSTFT = reshape(cleanSTFT,1,1,numel(cleanFrequencies),numel(cleanTimeInstants));
+noisySTFT = reshape(noisySTFT,1,1,numel(noisyFrenqeuncies),numel(noisyTimeInstants));
 
 targets    = cleanSTFT;
-predictors = STFTSegments;
+predictors = noisySTFT;
 
 % Arrange in a cell array for trainNetwork
 data = cell(size(targets,2),2);
