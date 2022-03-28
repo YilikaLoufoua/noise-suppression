@@ -63,20 +63,11 @@ cleanSTFT = abs(cleanSTFT(NumFeatures-1:end,:));
 noisySTFT = stft(noisyAudio, 'Window',win, 'OverlapLength', Overlap, 'FFTLength',FFTLength);
 noisySTFT = abs(noisySTFT(NumFeatures-1:end,:));
 
-noisySTFTAugmented = [noisySTFT(:,1:NumSegments-1) noisySTFT];
-
-% Generate the 8-segment training predictor signals from the noisy STFT. 
-STFTSegments = zeros(NumFeatures, NumSegments , size(noisySTFTAugmented,2) - NumSegments + 1);
-for index = 1 : size(noisySTFTAugmented,2) - NumSegments + 1
-    STFTSegments(:,:,index) = noisySTFTAugmented(:,index:index+NumSegments-1);
-end
 
 targets    = cleanSTFT;
-predictors = STFTSegments;
+predictors = noisySTFT;
 
 % Arrange in a cell array for trainNetwork
-data = cell(size(targets,2),2);
-for index=1:size(targets,2)
-    data{index,1} = predictors(:,:,index);
-    data{index,2} = targets(:,index);
-end
+data = cell(1,2);
+data{1,1} = predictors;
+data{1,2} = targets;
