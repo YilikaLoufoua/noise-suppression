@@ -24,7 +24,23 @@ classdef normLayer < nnet.layer.Layer & nnet.layer.Formattable
                 normed = permute(normed, [3,1,2,4]); %SCBT => BSCT  1   257    32   313
                 normed = reshape(normed, [size(normed,1)*size(normed,2),size(normed,3),size(normed,4)]);
                 normed = permute(normed, [1,3,2]); % BTC
-                normed = dlarray(normed,'BTS'); %257 313 32
+                normed = dlarray(normed,'TUC'); %257 313 32
+                 % numHiddenUnits = 384;
+                %  H0 = zeros(numHiddenUnits,1);
+                 % C0 = zeros(numHiddenUnits,1);
+                 % numFeatures = 32;
+                %  weights = dlarray(randn(4*numHiddenUnits,numFeatures),'CU');
+                 % recurrentWeights = dlarray(randn(4*numHiddenUnits,numHiddenUnits),'CU');
+                %  bias = dlarray(randn(4*numHiddenUnits,1),'C');
+                 % dlY = lstm(normed,H0,C0,weights,recurrentWeights,bias);
+                 % normed = dlY;
+                 % numFeatures = size(normed,1);
+                 % weights = dlarray(randn(4*numHiddenUnits,numFeatures),'CU');
+                 % recurrentWeights = dlarray(randn(4*numHiddenUnits,numHiddenUnits),'CU');
+                 % bias = dlarray(randn(4*numHiddenUnits,1),'C');
+                 % dlY = lstm(normed,H0,C0,weights,recurrentWeights,bias);
+                 % normed = dlY;
+                 % normed = dlarray(normed,'CTU'); %313   384   257  UCT
             end
             % max normalization
             % maxVal = max( X ,[], 'all' )+ 1e-5;

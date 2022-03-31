@@ -44,15 +44,31 @@ tempLayers = [
     concatenationLayer(2,2,"Name","concat")
     % 257    32     1   313  'SCBT'
     normLayer(true, "Name","norm_3") % output is 257 313 32 "BTC" but...
-    checkdimsLayer()
+    checkdimsLayer("Name","checkdim1")
+    % flattenLayer()
+    
     % 32     1   313  'CBT'
-    lstmLayer(numHiddenUnits_sb,"Name","lstm_3")
-    lstmLayer(numHiddenUnits_sb,"Name","lstm_4")
+    % lstmLayer(numHiddenUnits_sb,"Name","lstm_3")
+    % lstmLayer(numHiddenUnits_sb,"Name","lstm_4")
     % 384     1   313  'CBT'
-    fullyConnectedLayer(2,"Name","fc_2")
-    permuteLayer(true, [1,3,2,4],"Name","permute_3")
+    sequenceFoldingLayer("Name","seqfold") ];
+lgraph = addLayers(lgraph,tempLayers);
+    tempLayers = [relabelLayer('CBT', "Name","relabel_1")
+        checkdimsLayer("Name","checkdim5")
+        lstmLayer(numHiddenUnits_sb,"Name","lstm_3")
+        lstmLayer(numHiddenUnits_sb,"Name","lstm_4")
+        checkdimsLayer("Name","checkdim6")
+        fullyConnectedLayer(2,"Name","fc_2")
+        relabelLayer('CBU', "Name","relabel_2")
+        checkdimsLayer("Name","checkdim3")];
+lgraph = addLayers(lgraph,tempLayers);
+    tempLayers = [
+    sequenceUnfoldingLayer("Name","sequnfold")
+    checkdimsLayer("Name","checkdim4")
+    finalLayer()
     regressionLayer("Name","regressionoutput")];
 lgraph = addLayers(lgraph,tempLayers);
+    
 
 % clean up helper variable
 clear tempLayers;
@@ -60,9 +76,12 @@ lgraph = connectLayers(lgraph,"padLayer_1","norm_1");
 lgraph = connectLayers(lgraph,"padLayer_1","unfold_1");
 lgraph = connectLayers(lgraph,"unfold_1","concat/in2");
 lgraph = connectLayers(lgraph,"unsqueeze_1","concat/in1");
+lgraph = connectLayers(lgraph,"seqfold/out","relabel_1");
+lgraph = connectLayers(lgraph,"seqfold/miniBatchSize","sequnfold/miniBatchSize");
+lgraph = connectLayers(lgraph,"checkdim3","sequnfold/in");
 
 % training options
-miniBatchSize = 128;
+miniBatchSize = 48;
 options = trainingOptions("adam", ...
     MaxEpochs=3, ...
     InitialLearnRate=0.001,...
