@@ -1,19 +1,19 @@
 % Import clean audio dataset
 dataFolder = "datasets_fullband/clean_fullband";
-adsTrain = audioDatastore(fullfile(dataFolder), 'LabelSource', 'foldernames');
+adsClean = audioDatastore(fullfile(dataFolder), 'LabelSource', 'foldernames');
 
 % Import noise dataset
 noiseFolder = "datasets_fullband/noise_fullband";
 adsNoise = audioDatastore(fullfile(noiseFolder));
 
 % Select one random audio sample for testing
-adsTrain = shuffle(adsTrain);
-adsTest = subset(adsTrain, 1:1);
+adsClean = shuffle(adsClean);
+adsTest = subset(adsClean, 1:1);
 
 % Reduce data set to speed up training at the cost of performance
 reduceDataset = true;
 if reduceDataset
-    adsTrain = subset(adsClean,2:129);
+    adsTrain = subset(adsClean,2:33);
 end
 
 % Extract the training predictor and target magnitude STFT
@@ -37,7 +37,7 @@ layers = [
 options = trainingOptions("adam", ...
     MaxEpochs=3, ...
     InitialLearnRate=1e-5,...
-    MiniBatchSize=128, ...
+    MiniBatchSize=16, ...
     Shuffle="every-epoch", ...
     Plots="training-progress", ...
     Verbose=false, ...
