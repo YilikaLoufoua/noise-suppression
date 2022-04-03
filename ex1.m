@@ -14,11 +14,12 @@ overlap_length = 512-256;
 numHiddenUnits_fb = 512;
 numHiddenUnits_sb = 384;
 numSegments = 8;
+time = importdata("variable.txt");
 
 % Construct model layers
 lgraph = layerGraph();
 tempLayers = [
-    sequenceInputLayer([numFeatures,311],"Name","sequence_1")
+    sequenceInputLayer([numFeatures,time],"Name","sequence_1")
     padLayer("Name","padLayer_1")
     ];
 lgraph = addLayers(lgraph,tempLayers);
@@ -40,35 +41,19 @@ lgraph = addLayers(lgraph,tempLayers);
 
 tempLayers = [
     concatenationLayer(2,2,"Name","concat")
-    % 257    32     1   313  'SCBT'
-    normLayer(true, "Name","norm_3") % output is 257 313 32 "BTC" but...
-    % 32   257   313 'CTU'
-    % 32   5140  313  'CTU'
+    normLayer(true, "Name","norm_3") 
     sequenceFoldingLayer("Name","seqfold") ];
 lgraph = addLayers(lgraph,tempLayers);
     tempLayers = [
-        % 32   257   313  'CBU'
-        % 32   1608820 'CB'
-        relabelLayer(true,'CBT', "Name","relabel_1")
-        % 32   257   313  'CBT'
-        % 32   5140  313  'CBT'
+        relabelLayer(true,time+2, 'CBT', "Name","relabel_1")
         lstmLayer(numHiddenUnits_sb,"Name","lstm_3")
         lstmLayer(numHiddenUnits_sb,"Name","lstm_4")
-        % 384   257   313 'CBT'
-        % 384   5140  313 'CBT'
-        % checkdimsLayer("Name", "check_1")
         fullyConnectedLayer(1,"Name","fc_2")
-        % 1   257   313  'CBT'
-        % 1   5140  313  'CBT'
-        relabelLayer(false,'CB', "Name","relabel_2")];
+        relabelLayer(false,time+2,'CB', "Name","relabel_2")];
 lgraph = addLayers(lgraph,tempLayers);
     tempLayers = [
     sequenceUnfoldingLayer("Name","sequnfold")
-    % 1     1   257   313  'CBTU'
-    % 1     5140  313      'CBT'
-    finalLayer()
-    % 257   311     1     1   'SSCB'
-    % 257   311     1    20   'SSCB'
+    finalLayer(time+2)
     checkdimsLayer("Name", "check_2")
     regressionLayer("Name","regressionoutput")];
 lgraph = addLayers(lgraph,tempLayers);
@@ -85,7 +70,7 @@ lgraph = connectLayers(lgraph,"seqfold/miniBatchSize","sequnfold/miniBatchSize")
 lgraph = connectLayers(lgraph,"relabel_2","sequnfold/in");
 
 % training options
-miniBatchSize = 20;
+miniBatchSize = 4;
 options = trainingOptions("adam", ...
     MaxEpochs=3, ...
     InitialLearnRate=0.001,...

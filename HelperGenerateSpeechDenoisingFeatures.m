@@ -34,7 +34,7 @@ noise = resample(noise,1,6);
 % end
 
 inputFs = 8000;
-expected_length = 10;
+expected_length = 3;
 noiseSegment = noise;
 if numel(audio) > expected_length * inputFs
     audio = audio(1:expected_length * inputFs);
