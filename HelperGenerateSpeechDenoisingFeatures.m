@@ -10,9 +10,15 @@ function [targets, predictors] = HelperGenerateSpeechDenoisingFeatures(x, adsNoi
     numFeatures = ffTLength/2 + 1;
     numSegments = 8;
 
-    % Select a random noise sample
-    adsNoise = shuffle(adsNoise);
-    noise = read(adsNoise);
+    % Choose one noise file randomly. If the noise file is invalid, choose another one.
+    noiseFiles = adsNoise.Files;
+    ind = randi([1 length(noiseFiles)]);
+    noise = audioread(noiseFiles{ind});
+    while sum(isnan(noise)) > 0
+        ind = randi([1 length(noiseFiles)]);
+        noise = audioread(noiseFiles{ind});
+    end
+    noise = resample(noise,1,6);
 
     % Set the audio samples to uniform length of 10 seconds
     inputFs = 48000;
