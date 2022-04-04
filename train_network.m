@@ -1,4 +1,4 @@
-function net = train(adsClean, adsNoise, layers)
+function net = train_network(layers)
 
 % Define system parameters for generating target and predictor signals
 windowLength = 256;
@@ -9,6 +9,13 @@ inputFs = 48e3;
 fs = 8e3;
 numFeatures = ffTLength/2 + 1;
 numSegments = 8;
+
+% Import datasets
+downloadedfolders = ls("datasets_temp\");
+cleanFolder = append('datasets_temp\', downloadedfolders(3,1:end)); 
+adsClean = audioDatastore(cleanFolder);
+noiseFolder = append('datasets_temp\', downloadedfolders(4,1:end)); 
+adsNoise = audioDatastore(noiseFolder);
 
 % Create a sample rate converter to convert the 48 kHz audio to 8 kHz
 src = dsp.SampleRateConverter("InputSampleRate",inputFs, ...
@@ -72,5 +79,8 @@ options = trainingOptions("adam", ...
 
 % Train the network
 net = trainNetwork(trainPredictors,trainTargets,layers,options);
+
+% Delet used training data
+rmdir datasets_temp\ s
 
 end
