@@ -11,6 +11,9 @@ FFTLength    = WindowLength;
 NumFeatures  = 257;
 NumSegments  = 8;
 
+inputFs = 8000;
+expected_length = 3;
+
 % Convert from 48 Khz to 8 Khz
 audio = resample(audio,1,6);
 
@@ -18,10 +21,16 @@ audio = resample(audio,1,6);
 noiseFiles = noiseDataset.Files;
 ind = randi([1 length(noiseFiles)]);
 noise = audioread(noiseFiles{ind});
-while sum(isnan(noise)) > 0
+
+activity_threshold = 0.01;
+noise_activity = check_activity(noise(1:expected_length * inputFs));
+while sum(isnan(noise)) > 0 || noise_activity < activity_threshold
+    % message = "finding another...."+noise_activity
     ind = randi([1 length(noiseFiles)]);
     noise = audioread(noiseFiles{ind});
+    noise_activity = check_activity(noise(1:expected_length * inputFs));
 end
+% message2 = "found it!" + noise_activity
 noise = resample(noise,1,6);
 
 % Adjust lengths of speech and noise signals
@@ -33,8 +42,7 @@ noise = resample(noise,1,6);
 %     noiseSegment = noise(randind : randind + numel(audio) - 1);
 % end
 
-inputFs = 8000;
-expected_length = 10;
+
 noiseSegment = noise;
 if numel(audio) > expected_length * inputFs
     audio = audio(1:expected_length * inputFs);
@@ -71,3 +79,11 @@ predictors = noisySTFT;
 data = cell(1,2);
 data{1,1} = predictors;
 data{1,2} = targets;
+end
+
+function [percent_active] = check_activity(y, threshold)
+    if ~exist('threshold','var')
+        threshold=0.01;
+     end
+    percent_active = sum(abs(y) > threshold) / length(y);
+end

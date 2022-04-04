@@ -14,11 +14,12 @@ overlap_length = 512-256;
 numHiddenUnits_fb = 512;
 numHiddenUnits_sb = 384;
 numSegments = 8;
+time = importdata("variable.txt");
 
 % Construct model layers
 lgraph = layerGraph();
 tempLayers = [
-    sequenceInputLayer([numFeatures,311],"Name","sequence_1")
+    sequenceInputLayer([numFeatures,time],"Name","sequence_1")
     padLayer("Name","padLayer_1")
     ];
 lgraph = addLayers(lgraph,tempLayers);
@@ -30,42 +31,31 @@ lgraph = addLayers(lgraph,tempLayers);
 %LHS
 tempLayers = [
     normLayer(false,"Name","norm_1") %SBT
-    % permuteLayer(false,[1,3,2,4],"Name","permute_1")
-    % !
     lstmLayer(numHiddenUnits_fb,"Name","lstm_1")
     lstmLayer(numHiddenUnits_fb, "Name","lstm_2")
+    
     fullyConnectedLayer(numFeatures,"Name","fc_1")
     reluLayer("Name","relu")
-    % permuteLayer(false,[1,2,3,4],"Name","permute_2")
     unsqueezeLayer(2,"Name","unsqueeze_1")];
 lgraph = addLayers(lgraph,tempLayers);
 
 tempLayers = [
     concatenationLayer(2,2,"Name","concat")
-    % 257    32     1   313  'SCBT'
-    normLayer(true, "Name","norm_3") % output is 257 313 32 "BTC" but...
-    checkdimsLayer("Name","checkdim1")
-    % flattenLayer()
-    
-    % 32     1   313  'CBT'
-    % lstmLayer(numHiddenUnits_sb,"Name","lstm_3")
-    % lstmLayer(numHiddenUnits_sb,"Name","lstm_4")
-    % 384     1   313  'CBT'
+    normLayer(true, "Name","norm_3") 
     sequenceFoldingLayer("Name","seqfold") ];
 lgraph = addLayers(lgraph,tempLayers);
-    tempLayers = [relabelLayer('CBT', "Name","relabel_1")
-        checkdimsLayer("Name","checkdim5")
+    tempLayers = [
+        relabelLayer(true,time+2, 'CBT', "Name","relabel_1")
         lstmLayer(numHiddenUnits_sb,"Name","lstm_3")
         lstmLayer(numHiddenUnits_sb,"Name","lstm_4")
-        checkdimsLayer("Name","checkdim6")
-        fullyConnectedLayer(2,"Name","fc_2")
-        relabelLayer('CBU', "Name","relabel_2")
-        checkdimsLayer("Name","checkdim3")];
+        % checkdimsLayer()
+        fullyConnectedLayer(1,"Name","fc_2")
+        relabelLayer(false,time+2,'CB', "Name","relabel_2")];
 lgraph = addLayers(lgraph,tempLayers);
     tempLayers = [
     sequenceUnfoldingLayer("Name","sequnfold")
-    checkdimsLayer("Name","checkdim4")
-    finalLayer()
+    finalLayer(time+2)
+    checkdimsLayer("Name", "check_2")
     regressionLayer("Name","regressionoutput")];
 lgraph = addLayers(lgraph,tempLayers);
     
@@ -78,12 +68,14 @@ lgraph = connectLayers(lgraph,"unfold_1","concat/in2");
 lgraph = connectLayers(lgraph,"unsqueeze_1","concat/in1");
 lgraph = connectLayers(lgraph,"seqfold/out","relabel_1");
 lgraph = connectLayers(lgraph,"seqfold/miniBatchSize","sequnfold/miniBatchSize");
-lgraph = connectLayers(lgraph,"checkdim3","sequnfold/in");
+lgraph = connectLayers(lgraph,"relabel_2","sequnfold/in");
+
+% analyzeNetwork(lgraph);
 
 % training options
 miniBatchSize = 48;
 options = trainingOptions("adam", ...
-    MaxEpochs=3, ...
+    MaxEpochs=45, ...
     InitialLearnRate=0.001,...
     MiniBatchSize=miniBatchSize, ...
     Shuffle="every-epoch", ...
