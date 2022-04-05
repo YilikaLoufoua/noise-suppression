@@ -32,11 +32,12 @@ layers = [
 tic
 cleanUrl = cleanUrlList(1,1:end);
 noiseUrl = noiseUrlList(1,1:end);
+disp('Batch 1 datasets: download started.')
 [cleanFilePath, noiseFilePath] = downloadDatasets(cleanUrl, noiseUrl);
-disp('Downloading batch 1 of datasets')
+disp('Batch 1 datasets: ready for training.')
 extractDatasets(cleanFilePath, noiseFilePath);
 job_train = batch(@train_network, 1, {layers});
-disp('Training on batch 1 of datasets')
+disp('Batch 1 datasets: training started.')
 % net = train_network(layers); % Experiment w/o parallel process
 
 % Retrain network
@@ -46,12 +47,21 @@ for i = 2:size(cleanUrlList,1)
     job_download = batch(@downloadDatasets, 2, {cleanUrl, noiseUrl});
 
     % Print message
-    msg = 'Downloading batch %d of datasets\n';
+    msg = 'Batch %d datasets: download started.\n';
     fprintf(msg, i);
 
-%   downloadDatasets(cleanUrl, noiseUrl); % Experiment w/o parallel process
     wait(job_train);
+
+    % Print message
+    msg = 'Batch %d datasets: training completed.\n';
+    fprintf(msg, i-1);
+
     wait(job_download);
+
+    % Print message
+    msg = 'Batch %d datasets: ready for training.\n';
+    fprintf(msg, i);
+
     downloads = fetchOutputs(job_download);
     extractDatasets(downloads{1,1}, downloads{1,2});
     result = fetchOutputs(job_train);
@@ -59,14 +69,17 @@ for i = 2:size(cleanUrlList,1)
     job_train = batch(@train_network, 1, {layerGraph(net)});
 
     % Print message
-    msg = 'Training on batch %d of datasets\n';
+    msg = 'Batch %d datasets: training started.\n';
     fprintf(msg, i);
 
-
-%   net = train_network(layerGraph(net)); % Experiment w/o parallel process
 end
 
 wait(job_train);
+
+% Print message
+msg = 'Batch %d datasets: training completed.\n';
+fprintf(msg, size(cleanUrlList,1));
+
 result = fetchOutputs(job_train);
 net = result{1,1};
 delete(job_train);
