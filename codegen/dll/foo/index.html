@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Passing Data</title>
+</head>
+<body>
+    <script async type="text/javascript" src="foo.js"></script>
+    <script>
+        // JavaScript Array to Emscripten Heap
+        function _arrayToHeap(typedArray) {
+            var numBytes = typedArray.length * typedArray.BYTES_PER_ELEMENT;
+            var ptr = Module._malloc(numBytes);
+            var heapBytes = new Uint8Array(Module.HEAPU8.buffer, ptr, numBytes);
+            heapBytes.set(new Uint8Array(typedArray.buffer));
+            return heapBytes;
+        }
+        // Emscripten Heap to JavasSript Array
+        function _heapToArray(heapBytes, array) {
+            return new Float64Array(
+                heapBytes.buffer,
+                heapBytes.byteOffset,
+                heapBytes.length / array.BYTES_PER_ELEMENT);
+        }
+        // Free Heap
+        function _freeArray(heapBytes) {
+            Module._free(heapBytes.byteOffset);
+        }
+        // Example of Passing Data Arrays
+        var Module = {
+            onRuntimeInitialized: function () {
+                var a = [1, 2, 3];
+                var b = [3, 4, 5];
+                // Create Data    
+                var A = new Float64Array(a);
+                var B = new Float64Array(b);
+                var C = new Float64Array(3);
+                // Move Data to Heap
+                var Abytes = _arrayToHeap(A);
+                var Bbytes = _arrayToHeap(B);
+                var Cbytes = _arrayToHeap(C);
+                // Run Function
+                Module._foo_initialize();
+                Module._foo(Abytes.byteOffset, Bbytes.byteOffset, Cbytes.byteOffset)
+                Module._foo_terminate();
+                //  Copy Data from Heap
+                C = _heapToArray(Cbytes, C);
+                var c = Array.from(C);
+                // Free Data from Heap
+                _freeArray(Abytes);
+                _freeArray(Bbytes);
+                _freeArray(Cbytes);
+                // Display Results
+                console.log(a + " + " + b + " = " + c);
+            }
+        };
+    </script>
+</body>
+</html>

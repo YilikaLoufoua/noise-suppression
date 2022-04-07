@@ -1,0 +1,2 @@
+BUILDING_FOO
+MODEL=foo
