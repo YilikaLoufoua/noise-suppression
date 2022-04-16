@@ -49,13 +49,12 @@ lgraph = addLayers(lgraph,tempLayers);
         lstmLayer(numHiddenUnits_sb,"Name","lstm_3")
         lstmLayer(numHiddenUnits_sb,"Name","lstm_4")
         % checkdimsLayer()
-        fullyConnectedLayer(1,"Name","fc_2")
+        fullyConnectedLayer(2,"Name","fc_2")
         relabelLayer(false,time+2,'CB', "Name","relabel_2")];
 lgraph = addLayers(lgraph,tempLayers);
     tempLayers = [
     sequenceUnfoldingLayer("Name","sequnfold")
     finalLayer(time+2)
-    checkdimsLayer("Name", "check_2")
     regressionLayer("Name","regressionoutput")];
 lgraph = addLayers(lgraph,tempLayers);
     
@@ -70,20 +69,18 @@ lgraph = connectLayers(lgraph,"seqfold/out","relabel_1");
 lgraph = connectLayers(lgraph,"seqfold/miniBatchSize","sequnfold/miniBatchSize");
 lgraph = connectLayers(lgraph,"relabel_2","sequnfold/in");
 
-% analyzeNetwork(lgraph);
+analyzeNetwork(lgraph);
 
 % training options
-miniBatchSize = 48;
+miniBatchSize = 5;
 options = trainingOptions("adam", ...
-    MaxEpochs=45, ...
+    MaxEpochs=3, ...
     InitialLearnRate=0.001,...
     MiniBatchSize=miniBatchSize, ...
     Shuffle="every-epoch", ...
     Plots="training-progress", ...
-    Verbose=false, ...
-    LearnRateSchedule="piecewise", ...
-    LearnRateDropFactor=0.9, ...
-    LearnRateDropPeriod=1);
+    GradientDecayFactor=0.9,...
+    SquaredGradientDecayFactor=0.999);
 
 % train the model
 denoiseNetFullyConnected = trainNetwork(tds,lgraph,options);

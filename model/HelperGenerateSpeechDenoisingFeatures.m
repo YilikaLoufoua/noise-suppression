@@ -70,7 +70,7 @@ cleanSTFT = stft(audio, 'Window',win, 'OverlapLength', Overlap, 'FFTLength',FFTL
 cleanSTFT = abs(cleanSTFT(NumFeatures-1:end,:));
 noisySTFT = stft(noisyAudio, 'Window',win, 'OverlapLength', Overlap, 'FFTLength',FFTLength);
 noisySTFT = abs(noisySTFT(NumFeatures-1:end,:));
-
+cleanSTFT = buld_complex_ideal_ratio_mask(real(noisySTFT),imag(noisySTFT),real(cleanSTFT),imag(cleanSTFT));
 
 targets    = cleanSTFT;
 predictors = noisySTFT;
