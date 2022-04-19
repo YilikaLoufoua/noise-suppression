@@ -11,7 +11,7 @@ classdef checkdimsLayer < nnet.layer.Layer & nnet.layer.Formattable
             layer.Name = NVargs.Name;
         end
         function Z = predict(layer, X)
-            Z = X;
+            Z = dlarray(X, "SSBT");
         end
     end
     

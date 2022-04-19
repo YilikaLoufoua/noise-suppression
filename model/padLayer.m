@@ -11,12 +11,12 @@ classdef padLayer < nnet.layer.Layer & nnet.layer.Formattable
             layer.Name = NVargs.Name;
         end
         function Z = predict(layer, X)
-            % formated = reshape(size(X,1), 1,size(X,2),size(X,3));
-            % formated = padarray(X, [0,0,0,2],0,'post');
             formated = extractdata(X);
-            % formated = permute(formated, [3,2,1,4]);
             formated = padarray(formated, [0,2,0,0],0,'post');
+            maxVal = max( formated ,[], 'all' )+ 1e-5;
+            formated = formated / maxVal;
             formated = dlarray(formated,'STB');
+
             Z = formated;
         end
     end

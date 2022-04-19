@@ -66,11 +66,12 @@ noiseSegment = noiseSegment .* sqrt(cleanPower/noisePower);
 noisyAudio   = audio + noiseSegment;
 
 % Generate magnitude STFT vectors from the original and noisy audio signals.
-cleanSTFT = stft(audio, 'Window',win, 'OverlapLength', Overlap, 'FFTLength',FFTLength);
-cleanSTFT = abs(cleanSTFT(NumFeatures-1:end,:));
-noisySTFT = stft(noisyAudio, 'Window',win, 'OverlapLength', Overlap, 'FFTLength',FFTLength);
-noisySTFT = abs(noisySTFT(NumFeatures-1:end,:));
-cleanSTFT = buld_complex_ideal_ratio_mask(real(noisySTFT),imag(noisySTFT),real(cleanSTFT),imag(cleanSTFT));
+cleanSTFTComp = stft(audio, 'Window',win, 'OverlapLength', Overlap, 'FFTLength',FFTLength,"FrequencyRange","onesided");
+% cleanSTFTComp = cleanSTFTComp(NumFeatures-1:end,:);
+noisySTFTComp = stft(noisyAudio, 'Window',win, 'OverlapLength', Overlap, 'FFTLength',FFTLength,"FrequencyRange","onesided");
+% noisySTFTComp = noisySTFTComp(NumFeatures-1:end,:);
+noisySTFT = abs(noisySTFTComp);
+cleanSTFT = buld_complex_ideal_ratio_mask(real(noisySTFTComp),imag(noisySTFTComp),real(cleanSTFTComp),imag(cleanSTFTComp));
 
 targets    = cleanSTFT;
 predictors = noisySTFT;

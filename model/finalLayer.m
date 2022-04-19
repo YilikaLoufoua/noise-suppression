@@ -14,6 +14,8 @@ classdef finalLayer < nnet.layer.Layer & nnet.layer.Formattable
             layer.Name = NVargs.Name;
         end
         function Z = predict(layer, X)
+            % 2        1285          94   'CBT'
+            % 2      120790  'CB'
             formated = reshape(X, size(X,1),[],257,layer.timeSize);
             formated = formated(:,:,:,3:end);
             formated = dlarray(formated,"CBSS");
