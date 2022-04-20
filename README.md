@@ -1,3 +1,8 @@
-# noise-suppression
-Speech background noise suppression with MATLAB Deep Learning Toolbox
-> Problem description proposed by MathWorks [here](https://github.com/mathworks/MathWorks-Excellence-in-Innovation/tree/main/projects/Speech%20Background%20Noise%20Suppression%20with%20Deep%20Learning). Part of Microsfot Deep Noise Suppression (DNS) Challenge.
+# MATLAB-denoise
+MathWorks-Excellence-in-Innovation project 193 & SJTU EE397 project
+## Introduction
+This is the course project of SJTU EE397 course and project 193 of MathWorks Excellence in Innovation Projects. We learn from the idea of RNNoise and implement a speech noise reduction system based on MATLAB deep learning.
+## Remind
+* The TrainNetworks folder is used to train and simply test the network, use the ```DenoiseTrain.m``` to start it.
+* The code in ```objective comment``` is used to evalute the effect, with the objective comment.
+* Before run it, please download the ```voicebox``` in your MATLAB from http://www.ee.ic.ac.uk/hp/staff/dmb/voicebox/voicebox.html
