@@ -37,7 +37,7 @@ K=1;%sine order
 sineWindow=sin((pi * K * (m+1))/(N+1));
 %% --------------processing N speech---------------------
 for j=1:N1
-    j
+    % j
     audio=audioread(adsTrain.Files{j});
     % If the audio file is invalid, choose the next one.
     activity_threshold = 0.01;
@@ -136,46 +136,6 @@ for j=1:N1
     end
 end
 
-% network define
-lgraph = layerGraph();
-
-tempLayers = featureInputLayer(size(MFCC_noisy_all,2),"Name","featureinput");
-lgraph = addLayers(lgraph,tempLayers);
-
-tempLayers = [
-    fullyConnectedLayer(24,"Name","fc_1")
-    tanhLayer("Name","tanh")];
-lgraph = addLayers(lgraph,tempLayers);
-
-tempLayers = [
-    gruLayer(24,"Name","gru_1")
-    reluLayer("Name","relu_1")];
-lgraph = addLayers(lgraph,tempLayers);
-
-tempLayers = [
-    concatenationLayer(1,3,"Name","concat_1")
-    gruLayer(96,"Name","gru_2")
-    reluLayer("Name","relu_2")];
-lgraph = addLayers(lgraph,tempLayers);
-
-tempLayers = [
-    concatenationLayer(1,3,"Name","concat_2")
-    fullyConnectedLayer(17,"Name","fc_2")
-    sigmoidLayer("Name","sigmoid")
-    regressionLayer("Name","regressionoutput")];
-lgraph = addLayers(lgraph,tempLayers);
-
-% clean up helper variable
-clear tempLayers;
-
-lgraph = connectLayers(lgraph,"featureinput","fc_1");
-lgraph = connectLayers(lgraph,"featureinput","concat_1/in1");
-lgraph = connectLayers(lgraph,"featureinput","concat_2/in3");
-lgraph = connectLayers(lgraph,"tanh","gru_1");
-lgraph = connectLayers(lgraph,"tanh","concat_1/in2");
-lgraph = connectLayers(lgraph,"relu_1","concat_1/in3");
-lgraph = connectLayers(lgraph,"relu_1","concat_2/in2");
-lgraph = connectLayers(lgraph,"relu_2","concat_2/in1");
 
 %% -----------training network
 % training options
@@ -184,7 +144,7 @@ options = trainingOptions('adam',...
     'MaxEpochs',3,..., ...
     'MiniBatchSize',64, ...,
     'Shuffle','every-epoch',...
-    'Verbose',false,...
+    'Verbose',true,...
     'Plots','training-progress',...
     'ExecutionEnvironment','cpu');
 
@@ -193,7 +153,8 @@ net = trainNetwork(MFCC_noisy_all,g_b_all,layers,options);
 save('DenoiseNet0420.mat','net')
 
 % Delete used training data
-rmdir datasets_temp\ s
+rmdir('datasets_temp', 's');
+mkdir datasets_temp;
 
 function [percent_active] = check_activity(y, threshold)
     if ~exist('threshold','var')

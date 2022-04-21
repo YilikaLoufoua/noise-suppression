@@ -3,15 +3,16 @@ noiseUrlList = ['https://dns4public.blob.core.windows.net/dns4archive/datasets_f
 
 
 %% Import datasets
-cleanFolder = "datasets_fullband/clean_fullband";
+cleanFolder = "../datasets_fullband/clean_fullband";
 adsTrain = audioDatastore(fullfile(cleanFolder), IncludeSubfolders=true);
-noiseFolder = "datasets_fullband/noise_fullband";
+noiseFolder = "../datasets_fullband/noise_fullband";
 adsNoise = audioDatastore(fullfile(noiseFolder), IncludeSubfolders=true);
 
 %% --------Calculate the band filter---------
 w_b=get_wb();
 
-N1=size(adsTrain.Files,1); %Number of speech segments read
+% N1=size(adsTrain.Files,1); %Number of speech segments read
+N1 = 32;
 adsTrain.Files=adsTrain.Files(1:N1,:);
 frameLength=0.02; %framelength
 frameOverlap=0.01; %frameoverlap
@@ -39,7 +40,7 @@ K=1;%sine order
 sineWindow=sin((pi * K * (m+1))/(N+1));
 %% --------------processing N speech---------------------
 for j=1:N1
-    j
+    % j
     audio=audioread(adsTrain.Files{j});
     % If the audio file is invalid, choose the next one.
     activity_threshold = 0.01;
