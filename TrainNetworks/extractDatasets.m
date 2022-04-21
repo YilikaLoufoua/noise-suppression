@@ -1,8 +1,8 @@
 function extractDatasets(cleanFilePath, noiseFilePath)
 
 % Extract datasets
-untar(cleanFilePath, "datasets_temp\");
-untar(noiseFilePath, "datasets_temp\");
+unzip(cleanFilePath, "datasets_temp\");
+unzip(noiseFilePath, "datasets_temp\");
 
 delete *.zip
 

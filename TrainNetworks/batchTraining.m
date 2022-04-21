@@ -1,12 +1,14 @@
-cleanUrlList = ['https://dns4public.blob.core.windows.net/dns4archive/datasets_fullband/clean_fullband/datasets_fullband.clean_fullband.read_speech_003_3.96_4.02.tar.bz2';'https://dns4public.blob.core.windows.net/dns4archive/datasets_fullband/clean_fullband/datasets_fullband.clean_fullband.read_speech_001_3.75_3.88.tar.bz2';'https://dns4public.blob.core.windows.net/dns4archive/datasets_fullband/clean_fullband/datasets_fullband.clean_fullband.read_speech_002_3.88_3.96.tar.bz2'];
-noiseUrlList = ['https://dns4public.blob.core.windows.net/dns4archive/datasets_fullband/noise_fullband/datasets_fullband.noise_fullband.audioset_001.tar.bz2';'https://dns4public.blob.core.windows.net/dns4archive/datasets_fullband/noise_fullband/datasets_fullband.noise_fullband.audioset_002.tar.bz2';'https://dns4public.blob.core.windows.net/dns4archive/datasets_fullband/noise_fullband/datasets_fullband.noise_fullband.audioset_003.tar.bz2'];
+% cleanUrlList = ['https://dns4public.blob.core.windows.net/dns4archive/datasets_fullband/clean_fullband/datasets_fullband.clean_fullband.read_speech_003_3.96_4.02.tar.bz2';'https://dns4public.blob.core.windows.net/dns4archive/datasets_fullband/clean_fullband/datasets_fullband.clean_fullband.read_speech_001_3.75_3.88.tar.bz2';'https://dns4public.blob.core.windows.net/dns4archive/datasets_fullband/clean_fullband/datasets_fullband.clean_fullband.read_speech_002_3.88_3.96.tar.bz2'];
+% noiseUrlList = ['https://dns4public.blob.core.windows.net/dns4archive/datasets_fullband/noise_fullband/datasets_fullband.noise_fullband.audioset_001.tar.bz2';'https://dns4public.blob.core.windows.net/dns4archive/datasets_fullband/noise_fullband/datasets_fullband.noise_fullband.audioset_002.tar.bz2';'https://dns4public.blob.core.windows.net/dns4archive/datasets_fullband/noise_fullband/datasets_fullband.noise_fullband.audioset_003.tar.bz2'];
+cleanUrlList = ['https://filedropper.com/d/s/download/JgbbVRDPooDNEmub8ij2wffQJkT8in';'https://filedropper.com/d/s/download/TqjQexIp2786Z8bAi9IiCUWlkLVNQC';'https://filedropper.com/d/s/download/TqjQexIp2786Z8bAi9IiCUWlkLVNQC'];
+noiseUrlList = ['https://filedropper.com/d/s/download/ol8eD2PdZF3Q7gVgi52sctxCR99rpp';'https://filedropper.com/d/s/download/94n0xuKT98oxYcJTCzxHfX5AI6WFH8';'https://filedropper.com/d/s/download/94n0xuKT98oxYcJTCzxHfX5AI6WFH8'];
 
-%% --------------------
-% Import datasets
-cleanFolder = "datasets_fullband/clean_fullband";
-adsTrain = audioDatastore(fullfile(cleanFolder));
-noiseFolder = "datasets_fullband/noise_fullband";
-adsNoise = audioDatastore(fullfile(noiseFolder));
+
+%% Import datasets
+cleanFolder = "datasets_temp/clean_fullband";
+adsTrain = audioDatastore(fullfile(cleanFolder), IncludeSubfolders=true);
+noiseFolder = "datasets_temp/noise_fullband";
+adsNoise = audioDatastore(fullfile(noiseFolder), IncludeSubfolders=true);
 
 %% --------Calculate the band filter---------
 w_b=get_wb();
@@ -20,7 +22,7 @@ giveMFCCnums=8; %MFCC def
 numberPBs=4; %tones
 windowLength=frameLength*fs;
 windowOverlap=frameOverlap*fs;
-SNR=0;
+SNR=0; 
 number_MFCCs=16; %MFCC order
 
 % ----------MFCC define

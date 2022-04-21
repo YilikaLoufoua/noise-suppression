@@ -1,14 +1,13 @@
+function net = DenoiseTrain(layers)
+
 %% --------Calculate the band filter---------
 w_b=get_wb();
 %% --------------------
 
-% Import network
-load("DenoiseNet2_1216_03.mat");
-
 % Import datasets
-cleanFolder = "datasets_fullband/clean_fullband";
+cleanFolder = "datasets_temp/clean_fullband";
 adsTrain = audioDatastore(fullfile(cleanFolder), IncludeSubfolders=true);
-noiseFolder = "datasets_fullband/noise_fullband";
+noiseFolder = "datasets_temp/noise_fullband";
 adsNoise = audioDatastore(fullfile(noiseFolder), IncludeSubfolders=true);
 
 N1=size(adsTrain.Files,1); %Number of speech segments read
@@ -182,15 +181,15 @@ lgraph = connectLayers(lgraph,"relu_2","concat_2/in1");
 % training options
 options = trainingOptions('adam',...
     "InitialLearnRate",1e-5, ...
-    'MaxEpochs',3,..., ...
-    'MiniBatchSize',32, ...,
+    'MaxEpochs',1,..., ...
+    'MiniBatchSize',16, ...,
     'Shuffle','every-epoch',...
     'Verbose',false,...
     'Plots','training-progress',...
     'ExecutionEnvironment','cpu');
 
 % train and save
-net = trainNetwork(MFCC_noisy_all,g_b_all,layerGraph(net),options);
+net = trainNetwork(MFCC_noisy_all,g_b_all,layers,options);
 save('DenoiseNet0419.mat','net')
 
 function [percent_active] = check_activity(y, threshold)
@@ -198,4 +197,6 @@ function [percent_active] = check_activity(y, threshold)
         threshold=0.01;
      end
     percent_active = sum(abs(y) > threshold) / length(y);
+end
+
 end
