@@ -4,13 +4,13 @@ close all
 clc
 
 %% load the net
-load('DenoiseNet2_1216_03.mat');
+load('DenoiseNet0419.mat');
 %% choose the speech
 [file,path] = uigetfile('./Databases/*.wav', 'Select the speech files', 'MultiSelect', 'on'); 
 [audio_test,fs_test] = audioread([path,file]);
 
 % Import noise dataset
-noiseFolder = "datasets_fullband/noise_fullband";
+noiseFolder = "../datasets_fullband/noise_fullband";
 adsNoise = audioDatastore(fullfile(noiseFolder));
 noise_test = read(adsNoise);
 
