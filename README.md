@@ -4,7 +4,7 @@ MathWorks-Excellence-in-Innovation project 193
 ## Introduction
 This is a MLH Fellowship project assignment and project 193 of MathWorks Excellence in Innovation Projects, using MATLAB and its Audio Toolbox™ and Deep Learning Toolbox™ products to develop and train a noise suppression deep learning network.
 
-Detailed problem description proposed by MathWorks [here](https://github.com/mathworks/MathWorks-Excellence-in-Innovation/tree/main/projects/Speech%20Background%20Noise%20Suppression%20with%20Deep%20Learning). Part of [Microsfot Deep Noise Suppression (DNS) Challenge](https://github.com/microsoft/DNS-Challenge).
+Detailed problem description proposed by MathWorks [here](https://github.com/mathworks/MathWorks-Excellence-in-Innovation/tree/main/projects/Speech%20Background%20Noise%20Suppression%20with%20Deep%20Learning). Part of [Microsoft Deep Noise Suppression (DNS) Challenge](https://github.com/microsoft/DNS-Challenge).
 
 Our submission is a MATLAB implementation of the resarch paper, [FullSubNet: A Full-Band and Sub-Band Fusion Model for Real-Time Single-Channel Speech Enhancement](https://arxiv.org/abs/2010.15508), submitted by Hao, Xiang, et al. from Cornell University in October 2020.
 
