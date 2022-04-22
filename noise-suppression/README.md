@@ -29,7 +29,7 @@ First, clone the repository, then move the downloaded and extracted datasets int
 After training, you can denoise audio using our model. Run the script `denoise`, and you will be prompted to select an audio file. Then, our model will generated the denoised audio and save out to 'denoisedAudio.wav'.
 
 ## Notes
-Our repository includes the previous submission of this MathWorks Excellence in Innovation project, MATLAB-denoise, which performed noise suppression with the neural network they designed and trained using Gaussian noise (algorithmically generated signals). As a result, the model performed less idealy when tasked to denoise speech with realistic background noise (such as noises from a washing machine). Therefore, as part of our project, we trained their model on noise datasets provided in the Microsoft DNS Challenge repository.
+Our repository includes the previous submission of this MathWorks Excellence in Innovation project, [MATLAB-denoise](https://github.com/YilikaLoufoua/noise-suppression/tree/main/MATLAB-denoise), which performed noise suppression with the neural network they designed and trained using Gaussian noise (algorithmically generated signals). As a result, the model performed less idealy when tasked to denoise speech with realistic background noise (such as noises from a washing machine). Therefore, as part of our project, we trained their model on noise datasets provided in the Microsoft DNS Challenge repository.
 
 ## Acknowledgements
 https://github.com/haoxiangsnr/FullSubNet  
